@@ -1,4 +1,5 @@
-import { Document, Schema, model } from "mongoose";
+import { Document, Schema } from "mongoose";
+import timestamp from "mongoose-timestamp";
 
 export interface BaseModel extends Document {
   createdAt: Date;
@@ -6,12 +7,9 @@ export interface BaseModel extends Document {
   deletedAt?: Date;
 }
 
-const baseSchemaFields = {
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
+export const baseSchemaFields = {
   deletedAt: { type: Date, default: null },
 };
 
-const baseSchema = new Schema(baseSchemaFields, { versionKey: false });
-
-export default model<BaseModel>("BaseModel", baseSchema);
+export const baseSchema = new Schema(baseSchemaFields, { versionKey: false });
+baseSchema.plugin(timestamp);
