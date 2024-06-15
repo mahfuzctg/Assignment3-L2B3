@@ -1,12 +1,13 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import userModel, { IUser } from "../models/user.model";
 
 export const signup = async (req: Request, res: Response) => {
   const { name, email, role, password, phone, address } = req.body;
 
   try {
     // Check if user with the same email already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -18,7 +19,7 @@ export const signup = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new user instance
-    const newUser: IUser = new User({
+    const newUser: IUser = new userModel({
       name,
       email,
       role,

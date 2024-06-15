@@ -1,7 +1,8 @@
-import { Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 import { BaseModel } from "../utils/baseModel";
 
-export interface IUser extends BaseModel {
+// Define interface extending from BaseModel and Document
+export interface IUser extends BaseModel, Document {
   name: string;
   email: string;
   role: "user" | "admin";
@@ -10,6 +11,7 @@ export interface IUser extends BaseModel {
   address?: string;
 }
 
+// Define user schema fields
 const userSchemaFields = {
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -19,9 +21,11 @@ const userSchemaFields = {
   address: { type: String },
 };
 
-const userSchema = new Schema({
-  ...baseSchemaFields,
+// Create a new schema using the defined fields
+const userSchema = new Schema<IUser>({
   ...userSchemaFields,
+  // You can add more fields or extend here if needed
 });
 
+// Export the model
 export default model<IUser>("User", userSchema);
