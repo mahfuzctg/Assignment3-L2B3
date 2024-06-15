@@ -1,0 +1,25 @@
+src/
+  ├── config/
+  │   ├── db.ts        // Database connection setup
+  │   └── index.ts     // Configuration variables
+  ├── controllers/
+  │   ├── authController.ts    // Authentication controller
+  │   ├── carController.ts     // Car management controller
+  │   ├── bookingController.ts // Booking management controller
+  │   └── userController.ts    // User management controller
+  ├── middlewares/
+  │   └── auth.ts      // Authentication middleware
+  ├── models/
+  │   ├── User.ts      // User model (newly added)
+  │   ├── Car.ts       // Car model
+  │   └── Booking.ts   // Booking model
+  ├── routes/
+  │   ├── authRoutes.ts        // Authentication routes
+  │   ├── carRoutes.ts         // Car management routes
+  │   ├── bookingRoutes.ts     // Booking management routes
+  │   └── userRoutes.ts        // User management routes
+  ├── utils/
+  │   ├── baseModel.ts  // Base model definition
+  │   └── otherUtils.ts  // Other utility functions
+  ├── app.ts          // Express app setup
+  └── server.ts       // Server setup and entry point
