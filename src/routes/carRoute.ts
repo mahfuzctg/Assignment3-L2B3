@@ -1,7 +1,5 @@
-// carRoutes.ts
-
 import express from "express";
-
+import { createCar } from "../controllers/carController";
 import { protect, restrictTo } from "../middlewares/authMiddleware";
 
 const router = express.Router();

@@ -1,12 +1,8 @@
-// app.ts
-
 import cors from "cors";
-import dotenv from "dotenv";
 import express, { Application, NextFunction, Request, Response } from "express";
 import authRoutes from "./routes/authRoutes";
 import carRoutes from "./routes/carRoute";
 
-dotenv.config();
 const app: Application = express();
 
 // Middleware
@@ -15,7 +11,7 @@ app.use(cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/cars", carRoutes); // Use carRoutes for /api/cars
+app.use("/api/cars", carRoutes);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
@@ -39,8 +35,4 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+export default app;

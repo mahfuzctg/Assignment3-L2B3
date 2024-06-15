@@ -1,18 +1,20 @@
-// authMiddleware.ts
-
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
+import { IUser } from "../models/user.model";
 
-const JWT_SECRET = config.jwt_secret;
-
-interface JwtPayload {
+interface DecodedToken extends JwtPayload {
   id: string;
-  role: "user" | "admin";
+  role: string;
+}
+
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: IUser;
+  }
 }
 
 export const protect = (req: Request, res: Response, next: NextFunction) => {
-  // 1. Check if the Authorization header exists
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
@@ -21,34 +23,42 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  // 2. Extract the token from the Authorization header
   const token = authHeader.split(" ")[1];
+  const JWT_SECRET = config.jwt_secret;
 
-  // 3. Verify the token
-  jwt.verify(token, JWT_SECRET!, (err, decoded: JwtPayload | undefined) => {
-    if (err) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized - Invalid token",
-      });
-    }
+  if (!JWT_SECRET) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error - Missing JWT secret",
+    });
+  }
 
-    // Attach the decoded payload to the request object
-    req.user = decoded!;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
+    req.user = {
+      _id: decoded.id,
+      role: decoded.role,
+    } as IUser;
     next();
-  });
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized - Missing or invalid token",
+    });
+  }
 };
 
-export const restrictTo = (...roles: ("user" | "admin")[]) => {
+export const restrictTo = (role: string) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    // Check if the current user's role is included in the roles array
-    if (!roles.includes(req.user.role)) {
+    if (req.user && req.user.role === role) {
+      next();
+    } else {
       return res.status(403).json({
         success: false,
         message:
           "Forbidden - You do not have permission to access this resource",
       });
     }
-    next();
   };
 };
