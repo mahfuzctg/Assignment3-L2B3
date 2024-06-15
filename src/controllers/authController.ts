@@ -29,7 +29,7 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     // Save the user to the database
-    await newUser.save();
+    const savedUser = await newUser.save();
 
     // Prepare and send response
     res.status(201).json({
@@ -37,14 +37,14 @@ export const signup = async (req: Request, res: Response) => {
       statusCode: 201,
       message: "User registered successfully",
       data: {
-        _id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        phone: newUser.phone,
-        address: newUser.address,
-        createdAt: newUser.createdAt,
-        updatedAt: newUser.updatedAt,
+        _id: savedUser._id,
+        name: savedUser.name,
+        email: savedUser.email,
+        role: savedUser.role,
+        phone: savedUser.phone,
+        address: savedUser.address,
+        createdAt: savedUser.createdAt,
+        updatedAt: savedUser.updatedAt,
       },
     });
   } catch (error) {

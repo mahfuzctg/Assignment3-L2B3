@@ -21,11 +21,14 @@ const userSchemaFields = {
   address: { type: String },
 };
 
-// Create a new schema using the defined fields
-const userSchema = new Schema<IUser>({
-  ...userSchemaFields,
-  // You can add more fields or extend here if needed
-});
+// Create a new schema using the defined fields and enable timestamps
+const userSchema = new Schema<IUser>(
+  {
+    ...userSchemaFields,
+    // You can add more fields or extend here if needed
+  },
+  { timestamps: true } // Enable timestamps
+);
 
 // Export the model
 export default model<IUser>("User", userSchema);
