@@ -1,10 +1,10 @@
 import express from "express";
-import { createCar } from "../controllers/carController";
-import { protect, restrictTo } from "../middlewares/authMiddleware";
+import createCar from "../controllers/carController";
+import auth from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-// POST /api/cars - Create a new car (admin access only)
-router.post("/", protect, restrictTo("admin"), createCar);
+// Route protected by auth middleware with required roles
+router.post("/cars", auth("admin"), createCar);
 
 export default router;

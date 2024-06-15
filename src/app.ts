@@ -1,7 +1,11 @@
 import cors from "cors";
-import express, { Application, NextFunction, Request, Response } from "express";
+import dotenv from "dotenv";
+import express, { Application, Request, Response } from "express";
+import { errorHandler, notFoundHandler } from "./errHandlers/errorHandlers";
 import authRoutes from "./routes/authRoutes";
 import carRoutes from "./routes/carRoute";
+
+dotenv.config();
 
 const app: Application = express();
 
@@ -11,7 +15,7 @@ app.use(cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/cars", carRoutes);
+app.use("/api", carRoutes);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
@@ -19,20 +23,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Handle 404 - Route Not Found
-app.use("*", (req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
+app.use(notFoundHandler);
 
 // Error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
-});
+app.use(errorHandler);
 
 export default app;

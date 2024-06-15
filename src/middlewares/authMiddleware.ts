@@ -1,64 +1,56 @@
 import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
-import { IUser } from "../models/user.model";
 
-interface DecodedToken extends JwtPayload {
-  id: string;
-  role: string;
-}
+import UserModel from "../models/user.model";
+import catchAsync from "../utils/catchAsync";
 
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: IUser;
-  }
-}
+const auth = (...requiredRoles: string[]) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
 
-export const protect = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized - Missing or invalid token",
-    });
-  }
-
-  const token = authHeader.split(" ")[1];
-  const JWT_SECRET = config.jwt_secret;
-
-  if (!JWT_SECRET) {
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error - Missing JWT secret",
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
-    req.user = {
-      _id: decoded.id,
-      role: decoded.role,
-    } as IUser;
-    next();
-  } catch (error) {
-    console.error("Error verifying token:", error);
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized - Missing or invalid token",
-    });
-  }
-};
-
-export const restrictTo = (role: string) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (req.user && req.user.role === role) {
-      next();
-    } else {
-      return res.status(403).json({
+    // Checking if the token is missing
+    if (!token) {
+      return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
-        message:
-          "Forbidden - You do not have permission to access this resource",
+        statusCode: httpStatus.UNAUTHORIZED,
+        message: "You have no access to this route",
       });
     }
-  };
+
+    // Checking if the given token is valid
+    const decoded = jwt.verify(
+      token,
+      config.jwt_access_secret as string
+    ) as JwtPayload;
+
+    const { role, email } = decoded; // Here 'role' is declared but not used
+
+    // Checking if the user exists
+    const user = await UserModel.isUserExistsByEmail(email);
+
+    if (!user) {
+      return res.status(httpStatus.UNAUTHORIZED).json({
+        success: false,
+        statusCode: httpStatus.UNAUTHORIZED,
+        message: "You have no access to this route",
+      });
+    }
+
+    // Checking if the user has the required role
+    if (requiredRoles && !requiredRoles.includes(role)) {
+      return res.status(httpStatus.UNAUTHORIZED).json({
+        success: false,
+        statusCode: httpStatus.UNAUTHORIZED,
+        message: "You have no access to this route",
+      });
+    }
+
+    req.user = decoded as JwtPayload; // Storing decoded token in req.user for future use
+    next();
+  });
 };
+
+export default auth;

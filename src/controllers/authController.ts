@@ -1,20 +1,27 @@
+// src/controllers/auth.controller.ts
 import bcrypt from "bcrypt";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
 import jwt from "jsonwebtoken";
 import config from "../config";
-import userModel, { IUser } from "../models/user.model";
+import UserModel, { IUser } from "../models/user.model";
 
-const JWT_SECRET = config.jwt_secret;
+const JWT_ACCESS_SECRET = config.jwt_secret;
 
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { name, email, role, password, phone, address } = req.body;
 
   try {
     // Check if user with the same email already exists
-    const existingUser = await userModel.findOne({ email });
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(httpStatus.BAD_REQUEST).json({
         success: false,
+        statusCode: httpStatus.BAD_REQUEST,
         message: "Email already exists. Please use a different email address.",
       });
     }
@@ -23,7 +30,7 @@ export const signup = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new user instance
-    const newUser: IUser = new userModel({
+    const newUser: IUser = new UserModel({
       name,
       email,
       role,
@@ -36,9 +43,9 @@ export const signup = async (req: Request, res: Response) => {
     await newUser.save();
 
     // Prepare and send response
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
-      statusCode: 201,
+      statusCode: httpStatus.CREATED,
       message: "User registered successfully",
       data: {
         _id: newUser._id,
@@ -53,22 +60,24 @@ export const signup = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    next(error); // Pass the error to the error handling middleware
   }
 };
 
-export const signin = async (req: Request, res: Response) => {
+export const signin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { email, password } = req.body;
 
   try {
     // Find user by email
-    const user = await userModel.findOne({ email });
+    const user = await UserModel.findOne({ email });
     if (!user) {
-      return res.status(401).json({
+      return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
+        statusCode: httpStatus.UNAUTHORIZED,
         message: "Invalid email or password.",
       });
     }
@@ -76,21 +85,26 @@ export const signin = async (req: Request, res: Response) => {
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({
+      return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
+        statusCode: httpStatus.UNAUTHORIZED,
         message: "Invalid email or password.",
       });
     }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET!, {
-      expiresIn: "5h",
-    });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      JWT_ACCESS_SECRET!,
+      {
+        expiresIn: "5h",
+      }
+    );
 
     // Prepare and send response
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       success: true,
-      statusCode: 200,
+      statusCode: httpStatus.OK,
       message: "User logged in successfully",
       data: {
         _id: user._id,
@@ -102,13 +116,10 @@ export const signin = async (req: Request, res: Response) => {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
-      token: token,
+      token,
     });
   } catch (error) {
     console.error("Error logging in user:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    next(error); // Pass the error to the error handling middleware
   }
 };

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
 
 // 404 Not Found handler
 export const notFoundHandler = (
@@ -6,8 +7,9 @@ export const notFoundHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  res.status(404).json({
+  res.status(httpStatus.NOT_FOUND).json({
     success: false,
+    statusCode: httpStatus.NOT_FOUND,
     message: "Route not found",
   });
 };
@@ -20,8 +22,9 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   console.error(err.stack);
-  res.status(500).json({
+  res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
     success: false,
+    statusCode: httpStatus.INTERNAL_SERVER_ERROR,
     message: "Internal Server Error",
   });
 };

@@ -1,7 +1,8 @@
-// models/user.model.ts
 import { Document, Schema, model } from "mongoose";
 
 export interface IUser extends Document {
+  save(): unknown;
+  _id: string;
   name: string;
   email: string;
   password: string;
