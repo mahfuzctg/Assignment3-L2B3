@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 export interface ICar {
   save(): unknown;
-  _id: string;
+
   name: string;
   description: string;
   color: string;
