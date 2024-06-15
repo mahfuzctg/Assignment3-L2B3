@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import BaseModel from "../utils/baseModel";
+import { BaseModel } from "../utils/baseModel";
 
 export interface IUser extends BaseModel {
   name: string;

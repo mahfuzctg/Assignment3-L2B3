@@ -8,9 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-// app.use("/api/users", userRoutes);
-// app.use("/api/cars", carRoutes);
-// app.use("/api/reservations", reservationRoutes);
+app.use("/api/auth", authRoutes);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
