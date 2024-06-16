@@ -4,7 +4,7 @@ import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import config from "../config";
 
-import appError from "../errors/appError";
+import AppError from "../errors/AppError";
 import handleCastError from "../errors/handleCastError";
 import handleDuplicateError from "../errors/handleDuplicateError";
 import handleValidationError from "../errors/handleValidationError";
@@ -42,7 +42,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorSources;
-  } else if (err instanceof appError) {
+  } else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
     errorMessages = [

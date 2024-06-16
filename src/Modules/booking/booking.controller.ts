@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 
 import catchAsync from "../../utils/catchAsync";
 
-import { handleNoDataResponse } from "../../errors/handleNotFound";
+import { handleNoDataResponse } from "../../errors/handleNoData";
 import { getUserInfoFromToken } from "../../utils/getUserInfoFromToken";
 import sendResponse from "../../utils/sendResponse";
 import { Booking } from "./booking.model";

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-
-import { handleNoDataResponse } from "../../errors/handleNotFound";
+import { handleNoDataResponse } from "../../errors/handleNoData";
 import catchAsync from "../../utils/catchAsync";
 import { getUserInfoFromToken } from "../../utils/getUserInfoFromToken";
 import sendResponse from "../../utils/sendResponse";

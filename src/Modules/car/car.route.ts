@@ -1,13 +1,9 @@
 import express from "express";
-import { isAdmin } from "../../middlewares/isAdmin";
-import { carControllers } from "./car.controller";
+import { createCar } from "./car.controller"; // Import your controller method
 
 const router = express.Router();
 
-router.post("/", isAdmin, carControllers.createCar);
-router.get("/", carControllers.getAllCars);
-router.get("/:id", carControllers.getCarById);
-router.put("/:id", isAdmin, carControllers.updateCarById);
-router.delete("/:id", isAdmin, carControllers.deleteCarById);
+// POST /api/cars
+router.post("/", createCar);
 
 export default router;

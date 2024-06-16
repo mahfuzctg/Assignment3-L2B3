@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
-
 import app from "./app";
+
+import mongoose from "mongoose";
 import config from "./config";
 
 async function main() {
@@ -14,8 +14,5 @@ async function main() {
     console.log(error);
   }
 }
-console.log("Database URL:", config.database_url);
-console.log("BCrypt Salt Rounds:", config.bcrypt_salt_rounds);
-console.log("Default Pass:", config.default_pass);
-console.log("JWT Access Secret:", config.jwt_access_secret);
+
 main();
