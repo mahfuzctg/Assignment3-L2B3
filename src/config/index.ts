@@ -1,12 +1,29 @@
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
 
-export default {
-  port: process.env.PORT || 5000,
-  database_url: process.env.DATABASE_URL || "",
-  default_pass: process.env.DEFAULT_PASS || "",
-  bcrypt_salt_rounds: process.env.BCRYPT_SAlT_ROUNDS || 10,
-  jwt_secret:
-    process.env.JWT_SECRET ||
-    "72849ac5327e85131a038bcd2156f283064936cdcb4f742e81f5eaeb2a26de47",
+// Load environment variables from .env file
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+
+// Destructure environment variables with default values
+const {
+  NODE_ENV = "development",
+  PORT = "5000", // Default PORT as a string
+  DATABASE_URL,
+  BCRYPT_SALT_ROUNDS = "10", // Default BCRYPT_SALT_ROUNDS as a string
+  DEFAULT_PASS,
+  JWT_ACCESS_SECRET,
+  JWT_ACCESS_EXPIRES_IN = "1d", // Default JWT_ACCESS_EXPIRES_IN as a string representing a timespan
+} = process.env;
+
+// Define configuration object
+const config = {
+  node_env: NODE_ENV,
+  port: PORT,
+  database_url: DATABASE_URL,
+  bcrypt_salt_rounds: parseInt(BCRYPT_SALT_ROUNDS, 10), // Parse BCRYPT_SALT_ROUNDS as a number
+  default_pass: DEFAULT_PASS,
+  jwt_access_secret: JWT_ACCESS_SECRET,
+  jwt_access_expires_in: JWT_ACCESS_EXPIRES_IN, // Assign JWT_ACCESS_EXPIRES_IN directly as it's already a string
 };
+
+export default config;

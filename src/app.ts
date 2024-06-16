@@ -1,31 +1,24 @@
 import cors from "cors";
-import dotenv from "dotenv";
 import express, { Application, Request, Response } from "express";
-import { errorHandler, notFoundHandler } from "./errHandlers/errorHandlers";
-import authRoutes from "./routes/authRoutes";
-import carRoutes from "./routes/carRoute";
-
-dotenv.config();
+import globalErrorHandler from "./middlewares/globalErrorhandler";
+import notFound from "./middlewares/notFound";
+import router from "./route";
 
 const app: Application = express();
 
-// Middleware
+// parser
 app.use(express.json());
 app.use(cors());
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api", carRoutes);
+// application routes
+app.use("/api", router);
 
-// Root route
 app.get("/", (req: Request, res: Response) => {
-  res.send("Server is running properly!");
+  res.send("Welcome back!! Assignment 3!");
 });
+app.use(globalErrorHandler);
 
-// Handle 404 - Route Not Found
-app.use(notFoundHandler);
-
-// Error handling middleware
-app.use(errorHandler);
+//Not Found
+app.use(notFound);
 
 export default app;

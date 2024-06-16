@@ -1,22 +1,21 @@
 import mongoose from "mongoose";
+
 import app from "./app";
 import config from "./config";
 
-const startServer = async () => {
+async function main() {
   try {
-    await mongoose.connect(config.database_url, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true as unknown as boolean,
-    });
-    console.log("Connected to MongoDB");
-
-    const port = config.port || 5000;
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+    await mongoose.connect(config.database_url as string);
+    console.log("mongoDB connected");
+    app.listen(config.port, () => {
+      console.log(`Example app listening on port ${config.port}`);
     });
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    console.log(error);
   }
-};
-
-startServer();
+}
+console.log("Database URL:", config.database_url);
+console.log("BCrypt Salt Rounds:", config.bcrypt_salt_rounds);
+console.log("Default Pass:", config.default_pass);
+console.log("JWT Access Secret:", config.jwt_access_secret);
+main();

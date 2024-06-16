@@ -3,15 +3,16 @@ import httpStatus from "http-status";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 
-import UserModel from "../models/user.model";
+import { TUserRole } from "../Modules/user/user.interface";
+import { User } from "../Modules/user/user.model";
 import catchAsync from "../utils/catchAsync";
 
-const auth = (...requiredRoles: string[]) => {
+const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(" ")[1];
 
-    // Checking if the token is missing
+    // checking if the token is missing
     if (!token) {
       return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
@@ -19,17 +20,18 @@ const auth = (...requiredRoles: string[]) => {
         message: "You have no access to this route",
       });
     }
-
-    // Checking if the given token is valid
+    // checking if the given token is valid
     const decoded = jwt.verify(
       token,
       config.jwt_access_secret as string
     ) as JwtPayload;
 
-    const { role, email } = decoded; // Here 'role' is declared but not used
+    const { role, email } = decoded;
 
-    // Checking if the user exists
-    const user = await UserModel.isUserExistsByEmail(email);
+    // console.log(email)
+
+    // checking if the user is exist
+    const user = await User.isUserExistsByEmail(email);
 
     if (!user) {
       return res.status(httpStatus.UNAUTHORIZED).json({
@@ -38,8 +40,8 @@ const auth = (...requiredRoles: string[]) => {
         message: "You have no access to this route",
       });
     }
+    // checking if the user is already deleted
 
-    // Checking if the user has the required role
     if (requiredRoles && !requiredRoles.includes(role)) {
       return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
@@ -48,7 +50,7 @@ const auth = (...requiredRoles: string[]) => {
       });
     }
 
-    req.user = decoded as JwtPayload; // Storing decoded token in req.user for future use
+    req.user = decoded as JwtPayload;
     next();
   });
 };

@@ -1,17 +1,9 @@
-import { JwtPayload } from "jsonwebtoken";
-import "mongoose";
+// import { JwtPayload } from "jsonwebtoken";
 
-declare module "mongoose" {
-  interface ConnectOptions {
-    useNewUrlParser?: boolean;
-    useUnifiedTopology?: boolean;
-  }
-}
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
-  }
-}
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: JwtPayload;
+//     }
+//   }
+// }
