@@ -1,3 +1,5 @@
+// src/app.ts
+
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
 
@@ -7,19 +9,22 @@ import router from "./routes";
 
 const app: Application = express();
 
-// parser
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-// application routes
+// Routes
 app.use("/api", router);
 
-app.get("/", (req: Request, res: Response) => {
+// Default route
+app.get("/", (_req: Request, res: Response) => {
   res.send("Hello Assignment 3!");
 });
+
+// Error handling middleware
 app.use(globalErrorHandler);
 
-//Not Found
+// Not Found middleware
 app.use(notFound);
 
 export default app;

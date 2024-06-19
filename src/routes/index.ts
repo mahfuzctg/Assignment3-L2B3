@@ -1,7 +1,8 @@
+// src/routes/index.ts
 import { Router } from "express";
-
 import { AuthRoutes } from "../Modules/auth/auth.route";
-import { BookingsRoutes } from "../Modules/booking/booking.route";
+
+import { BookingRoutes } from "../Modules/booking/booking.route";
 import { CarRoutes } from "../Modules/car/car.route";
 import { UserRoutes } from "../Modules/user/user.route";
 
@@ -20,10 +21,9 @@ const moduleRoutes = [
     path: "/cars",
     route: CarRoutes,
   },
-
   {
     path: "/bookings",
-    route: BookingsRoutes,
+    route: BookingRoutes,
   },
 ];
 

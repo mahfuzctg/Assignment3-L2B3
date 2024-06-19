@@ -1,58 +1,52 @@
+// src/middlewares/auth.ts
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { User } from "../Modules/user/user.model";
 import config from "../config";
 
-import { TUserRole } from "../Modules/user/user.interface";
-import { User } from "../Modules/user/user.model";
-import catchAsync from "../utils/catchAsync";
+const authMiddleware = (...requiredRoles: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader && authHeader.split(" ")[1];
 
-const auth = (...requiredRoles: TUserRole[]) => {
-  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+      if (!token) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          success: false,
+          message: "No token provided",
+        });
+      }
 
-    // checking if the token is missing
-    if (!token) {
+      const decoded = jwt.verify(
+        token,
+        config.jwt_access_secret as Secret
+      ) as JwtPayload;
+
+      const user = await User.findById(decoded._id);
+      if (!user) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      if (requiredRoles.length && !requiredRoles.includes(user.role)) {
+        return res.status(httpStatus.FORBIDDEN).json({
+          success: false,
+          message: "Insufficient role",
+        });
+      }
+
+      req.user = user;
+      next();
+    } catch (error) {
       return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
-        statusCode: httpStatus.UNAUTHORIZED,
-        message: "You have no access to this route",
+        message: "Unauthorized",
       });
     }
-    // checking if the given token is valid
-    const decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string
-    ) as JwtPayload;
-
-    const { role, email } = decoded;
-
-    // console.log(email)
-
-    // checking if the user is exist
-    const user = await User.isUserExistsByEmail(email);
-
-    if (!user) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        success: false,
-        statusCode: httpStatus.UNAUTHORIZED,
-        message: "You have no access to this route",
-      });
-    }
-    // checking if the user is already deleted
-
-    if (requiredRoles && !requiredRoles.includes(role)) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        success: false,
-        statusCode: httpStatus.UNAUTHORIZED,
-        message: "You have no access to this route",
-      });
-    }
-
-    req.user = decoded as JwtPayload;
-    next();
-  });
+  };
 };
 
-export default auth;
+export default authMiddleware;
