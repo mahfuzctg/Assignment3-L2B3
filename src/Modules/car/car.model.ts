@@ -2,7 +2,7 @@
 
 import { Document, Schema, model } from "mongoose";
 
-interface CarDocument extends Document {
+export interface CarDocument extends Document {
   name: string;
   description: string;
   color: string;
@@ -31,5 +31,4 @@ const carSchema = new Schema<CarDocument>(
   }
 );
 
-const Car = model<CarDocument>("Car", carSchema);
-export default Car;
+export const Car = model<CarDocument>("Car", carSchema);

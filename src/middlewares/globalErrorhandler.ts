@@ -4,7 +4,7 @@ import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import config from "../config";
 
-import AppError from "../errors/AppError";
+import AppError from "../errors/appError";
 import handleCastError from "../errors/handleCastError";
 import handleDuplicateError from "../errors/handleDuplicateError";
 import handleValidationError from "../errors/handleValidationError";

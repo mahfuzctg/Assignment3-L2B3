@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const createServiceValidationSchema = z.object({
+const createCarValidationSchema = z.object({
   body: z.object({
     name: z
       .string({
@@ -12,16 +12,12 @@ const createServiceValidationSchema = z.object({
         invalid_type_error: "Description must be a string",
       })
       .min(1, "Description is required"),
-    price: z
+    pricePerHour: z
       .number({
-        invalid_type_error: "Price must be a number",
+        invalid_type_error: "pricePerHour must be a number",
       })
-      .min(0, "Price must be at least 0"),
-    duration: z
-      .number({
-        invalid_type_error: "Duration must be a number",
-      })
-      .min(1, "Duration must be at least 1 minute"),
+      .min(0, "pricePerHour must be at least 0"),
+
     isDeleted: z
       .boolean({
         invalid_type_error: "isDeleted must be a boolean",
@@ -30,7 +26,7 @@ const createServiceValidationSchema = z.object({
   }),
 });
 
-const updateServiceValidationSchema = z.object({
+const updateCarValidationSchema = z.object({
   body: z.object({
     name: z
       .string({
@@ -44,18 +40,13 @@ const updateServiceValidationSchema = z.object({
       })
       .min(1, "Description is required")
       .optional(),
-    price: z
+    pricePerHour: z
       .number({
-        invalid_type_error: "Price must be a number",
+        invalid_type_error: "PricePerHour must be a number",
       })
-      .min(0, "Price must be at least 0")
+      .min(0, "pricePerHour must be at least 0")
       .optional(),
-    duration: z
-      .number({
-        invalid_type_error: "Duration must be a number",
-      })
-      .min(1, "Duration must be at least 1 minute")
-      .optional(),
+
     isDeleted: z
       .boolean({
         invalid_type_error: "isDeleted must be a boolean",
@@ -64,7 +55,7 @@ const updateServiceValidationSchema = z.object({
   }),
 });
 
-export const ServiceValidations = {
-  createServiceValidationSchema,
-  updateServiceValidationSchema,
+export const CarValidations = {
+  createCarValidationSchema,
+  updateCarValidationSchema,
 };

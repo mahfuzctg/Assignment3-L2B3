@@ -1,37 +1,12 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
 // src/interfaces/booking.interface.ts
 
 import { Types } from "mongoose";
 
-export type VehicleType =
-  | "car"
-  | "truck"
-  | "SUV"
-  | "van"
-  | "motorcycle"
-  | "bus"
-  | "electricVehicle"
-  | "hybridVehicle"
-  | "bicycle"
-  | "tractor";
-
-export interface TBooking {
-  customer: Types.ObjectId;
-  service: Types.ObjectId;
-  slot: Types.ObjectId;
-  vehicleType: VehicleType;
-  vehicleBrand: string;
-  vehicleModel: string;
-  manufacturingYear: number;
-  registrationPlate: string;
-}
-
-export interface TBookingRequest {
-  serviceId: Types.ObjectId;
-  slotId: Types.ObjectId;
-  vehicleType: VehicleType;
-  vehicleBrand: string;
-  vehicleModel: string;
-  manufacturingYear: number;
-  registrationPlate: string;
+export interface IBooking {
+  date: Date;
+  user: Types.ObjectId | string; // Reference to user model
+  car: Types.ObjectId | string; // Reference to car model
+  startTime: string; // 24hr format, e.g., "14:30"
+  endTime: string; // 24hr format, e.g., "16:45"
+  totalCost: number; // Calculated using startTime, endTime, and possibly pricePerHour
 }

@@ -3,7 +3,7 @@ import express, { Application, Request, Response } from "express";
 
 import globalErrorHandler from "./middlewares/globalErrorhandler";
 import notFound from "./middlewares/notFound";
-import router from "./route";
+import router from "./routes";
 
 const app: Application = express();
 

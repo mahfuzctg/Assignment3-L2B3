@@ -1,4 +1,4 @@
-export type CarModel = {
+export type TCar = {
   name: string; // The name of the car.
   description: string; // A brief description of what the car entails.
   color: string; // The color of the car.

@@ -5,8 +5,9 @@ import catchAsync from "../../utils/catchAsync";
 import { handleNoDataResponse } from "../../errors/handleNoData";
 import { getUserInfoFromToken } from "../../utils/getUserInfoFromToken";
 import sendResponse from "../../utils/sendResponse";
+
 import { Booking } from "./booking.model";
-import { bookingServices } from "./booking.service";
+import { bookingCars } from "./booking.service";
 
 const createBooking = catchAsync(async (req, res) => {
   const token = req.headers.authorization;
@@ -14,7 +15,7 @@ const createBooking = catchAsync(async (req, res) => {
 
   const { email } = getUserInfoFromToken(token as string);
 
-  const result = await bookingServices.createBookingIntoDB(email, bookingData);
+  const result = await bookingCars.createBookingIntoDB(email, bookingData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -25,12 +26,10 @@ const createBooking = catchAsync(async (req, res) => {
 });
 
 const getAllBookings = catchAsync(async (req, res) => {
-  // const result = await Service.find()
+  // const result = await Car.find()
   const result = await Booking.find()
     .populate("customer", "_id name email phone address")
-    .populate("service", "_id name description price duration isDeleted")
-    .populate("slot", "_id service date startTime endTime isBooked")
-    .lean();
+    .populate("car", "_id name description price duration isDeleted");
 
   if (result?.length === 0) {
     return handleNoDataResponse(res);
@@ -39,7 +38,7 @@ const getAllBookings = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Service is retrieved successfully",
+    message: "Car is retrieved successfully",
     data: result,
   });
 });

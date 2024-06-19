@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
-
 import config from "../../config";
 import { TUser, UserModel } from "./user.interface";
 
@@ -33,7 +32,11 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// hide password after saving password
+// // set '' after saving password
+// userSchema.post("save", function (doc, next) {
+//   doc.password = "";
+//   next();
+// });
 userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
   delete userObject.password;
