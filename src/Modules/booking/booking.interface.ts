@@ -1,15 +1,10 @@
-import { Document } from "mongoose";
-import { TCar } from "../car/car.interface";
-import { TUser } from "../user/user.interface";
+import { Types } from "mongoose";
 
-export interface IBooking extends Document {
-  _id: string;
+export interface IBooking {
   date: string;
   startTime: string;
-  endTime: string | null;
-  user: TUser["_id"];
-  car: TCar["_id"];
+  endTime: string;
+  user: Types.ObjectId;
+  car: Types.ObjectId;
   totalCost: number;
-  createdAt: Date;
-  updatedAt: Date;
 }

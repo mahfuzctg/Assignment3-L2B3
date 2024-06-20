@@ -1,20 +1,16 @@
-// src/server.ts
 import mongoose from "mongoose";
 import app from "./app";
 import config from "./config";
 
-const connectDB = async () => {
+async function main() {
   try {
     await mongoose.connect(config.database_url as string);
-    console.log("Database connected successfully");
-
-    app.listen(config.port, () => {
-      console.log(`Server is running on port ${config.port}`);
+    app.listen(process.env.PORT || config.port, () => {
+      console.log(`app is listening on port ${config.port}`);
     });
-  } catch (error) {
-    console.error("Database connection error", error);
-    process.exit(1);
+  } catch (err) {
+    console.log(err);
   }
-};
+}
 
-connectDB();
+main();

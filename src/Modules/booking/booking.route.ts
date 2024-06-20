@@ -1,17 +1,23 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../../modules/user/user.constant";
-import BookingController from "./booking.controller";
+import { Router } from "express";
+import { auth } from "../../middlewares/auth";
+import validateRequest from "../../middlewares/validateRequest";
+import { USER_ROLES } from "../user/user.constant";
+import { BookingController } from "./booking.controller";
+import { BookingValidation } from "./booking.validation";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", auth([USER_ROLE.admin]), BookingController.getAllBookings);
-router.post("/", auth([USER_ROLE.user]), BookingController.bookCar);
+router.post(
+  "/",
+  auth(USER_ROLES.user),
+  validateRequest(BookingValidation.createBookingValidationSchema),
+  BookingController.createBooking
+);
 router.get(
   "/my-bookings",
-  auth([USER_ROLE.user]),
-  BookingController.getUserBookings
+  auth(USER_ROLES.user),
+  BookingController.getUsersBooking
 );
-router.post("/return-car", auth([USER_ROLE.user]), BookingController.returnCar);
+router.get("/", auth(USER_ROLES.admin), BookingController.getAllBookings);
 
 export const BookingRoutes = router;

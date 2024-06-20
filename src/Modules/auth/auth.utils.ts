@@ -1,11 +1,8 @@
-import jwt from "jsonwebtoken";
-
-export const createToken = (
-  jwtPayload: { email: string; role: string },
-  secret: string,
-  expiresIn: string
-) => {
-  return jwt.sign(jwtPayload, secret, {
-    expiresIn,
-  });
+import bcrypt from "bcrypt";
+export const isPasswordMatched = async (
+  plainPassword: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  const isMatched = await bcrypt.compare(plainPassword, hashedPassword);
+  return isMatched;
 };

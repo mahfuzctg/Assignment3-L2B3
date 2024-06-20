@@ -1,72 +1,117 @@
-import mongoose from "mongoose";
-import Booking from "../booking/booking.model";
-import { IBooking } from "./booking.interface";
+import { Request, Response } from 'express';
+import httpStatus from 'http-status';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../../config';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 
-class BookingService {
-  async getAllBookings(query: any): Promise<IBooking[]> {
-    return Booking.find(query).populate("car").populate("user").exec();
+import AppError from '../../errors/appError';
+import { AuthError } from '../../errors/authError';
+import { User } from '../user/user.model';
+import { BookingServices } from './booking.service';
+
+const createBooking = catchAsync(async (req: Request, res: Response) => {
+  const { carId, ...bookingData } = req.body;
+  bookingData.car = carId;
+  const userToken = req.headers.authorization?.split(' ')[1];
+  if (!userToken) {
+    return AuthError(req, res);
   }
 
-  async getUserBookings(userId: mongoose.Types.ObjectId): Promise<IBooking[]> {
-    return Booking.find({ user: userId }).populate("car").exec();
+  const decoded = jwt.verify(
+    userToken,
+    config.JWT_ACCESS_SECRET as string,
+  ) as JwtPayload;
+
+  const user = await User.findOne({ email: decoded.email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const bookingObj = {
+    ...bookingData,
+    user: user?._id,
+  };
+
+  const result = await BookingServices.createBookingIntoDB(bookingObj);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Car booked successfully',
+    data: result,
+  });
+});
+
+const getAllBookings = catchAsync(async (req: Request, res: Response) => {
+  const { carId, date } = req.query;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const queryObj: any = {};
+  if (req.query.carId) {
+    queryObj.car = carId;
+  }
+  if (req.query.date) {
+    queryObj.date = date;
   }
 
-  async bookCar(
-    userId: mongoose.Types.ObjectId,
-    carId: mongoose.Types.ObjectId,
-    date: string,
-    startTime: string
-  ): Promise<IBooking> {
-    const newBooking = new Booking({
-      user: userId,
-      car: carId,
-      date,
-      startTime,
-      totalCost: 0, // Assuming cost calculation is done later
+  if (req.query.carId && req.query.date) {
+    queryObj.car = carId;
+    queryObj.date = date;
+  }
+  const result = await BookingServices.getAllBookings(queryObj);
+  if (!result || result.length === 0) {
+    res.status(httpStatus.NOT_FOUND).json({
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: 'No Data Found',
+      data: [],
     });
-    return newBooking.save();
+  }
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Bookings retrieved successfully',
+    data: result,
+  });
+});
+
+const getUsersBooking = catchAsync(async (req: Request, res: Response) => {
+  const userToken = req.headers.authorization?.split(' ')[1];
+  if (!userToken) {
+    return AuthError(req, res);
   }
 
-  async returnCar(
-    bookingId: mongoose.Types.ObjectId,
-    endTime: string
-  ): Promise<IBooking | null> {
-    const booking = await Booking.findById(bookingId).populate("car").exec();
-    if (!booking) {
-      throw new Error("Booking not found");
-    }
-    booking.endTime = endTime;
-    booking.totalCost = this.calculateTotalCost(
-      booking.startTime,
-      endTime,
-      booking.car.pricePerHour
-    );
-    return booking.save();
+  const decoded = jwt.verify(
+    userToken,
+    config.JWT_ACCESS_SECRET as string,
+  ) as JwtPayload;
+
+  const user = await User.findOne({ email: decoded.email });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
-  async updateBooking(
-    bookingId: mongoose.Types.ObjectId,
-    updateData: Partial<IBooking>
-  ): Promise<IBooking | null> {
-    return Booking.findByIdAndUpdate(bookingId, updateData, {
-      new: true,
-    }).exec();
+  const result = await BookingServices.getUsersBooking(user?._id);
+
+  if (!result || result.length === 0) {
+    res.status(httpStatus.NOT_FOUND).json({
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: 'No Data Found',
+      data: [],
+    });
   }
 
-  async getCarById(carId: mongoose.Types.ObjectId) {
-    return Booking.findById(carId).exec(); // Assuming the car information is stored in Booking model
-  }
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'My Bookings retrieved successfully',
+    data: result,
+  });
+});
 
-  calculateTotalCost(
-    startTime: string,
-    endTime: string,
-    pricePerHour: number
-  ): number {
-    const start = new Date(`1970-01-01T${startTime}Z`).getTime();
-    const end = new Date(`1970-01-01T${endTime}Z`).getTime();
-    const hours = (end - start) / (1000 * 60 * 60);
-    return hours * pricePerHour;
-  }
-}
-
-export default new BookingService();
+export const BookingController = {
+  getAllBookings,
+  createBooking,
+  getUsersBooking,
+};

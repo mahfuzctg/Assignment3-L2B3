@@ -1,38 +1,36 @@
-import express from "express";
-import auth from "../../middlewares/auth";
+import { Router } from "express";
+import { auth } from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
-import { USER_ROLE } from "../user/user.constant";
-import { carControllers } from "./car.controller";
+import { USER_ROLES } from "../user/user.constant";
+import { CarController } from "./car.controller";
 import { CarValidations } from "./car.validation";
 
-const router = express.Router();
+const router = Router();
 
-// Return the car (accessible only to admin)
-router.put("/return", auth(USER_ROLE.admin), carControllers.returnCar);
-
-// Car creating route
 router.post(
   "/",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLES.admin),
   validateRequest(CarValidations.createCarValidationSchema),
-  carControllers.createCar
+  CarController.createCar
 );
 
-// Get a car
-router.get("/:id", carControllers.getSingleCar);
+router.get("/", CarController.getAllCar);
 
-// Update a car
+router.get("/:id", CarController.getSingleCar);
+
+router.put(
+  "/return",
+  auth(USER_ROLES.admin),
+  validateRequest(CarValidations.returnCarValidationSchema),
+  CarController.returnAndUpdate
+);
+
 router.put(
   "/:id",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLES.admin),
   validateRequest(CarValidations.updateCarValidationSchema),
-  carControllers.updateCar
+  CarController.returnAndUpdate
 );
-
-// Delete a car
-router.delete("/:id", auth(USER_ROLE.admin), carControllers.deleteCar);
-
-// Get all cars
-router.get("/", carControllers.getAllCars);
+router.delete("/:id", CarController.deleteCar);
 
 export const CarRoutes = router;

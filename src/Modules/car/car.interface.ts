@@ -1,7 +1,4 @@
-import mongoose from "mongoose";
-
-export interface TCar {
-  _id: mongoose.Types.ObjectId;
+export type TCar = {
   name: string;
   description: string;
   color: string;
@@ -9,5 +6,10 @@ export interface TCar {
   status: string;
   features: string[];
   pricePerHour: number;
-  isDeleted?: boolean;
-}
+  isDeleted: boolean;
+};
+
+export type TReturnCar = {
+  bookingId: string;
+  endTime: string;
+};
