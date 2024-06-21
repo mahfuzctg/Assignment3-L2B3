@@ -64,6 +64,35 @@ class BookingController {
       });
     }
   }
+
+  async returnCar(req: Request, res: Response): Promise<void> {
+    const { bookingId, endTime } = req.body;
+    if (!bookingId || !endTime) {
+      res.status(400).json({
+        success: false,
+        message: "bookingId and endTime are required in the request body",
+      });
+      return;
+    }
+    try {
+      const updatedBooking = await BookingService.returnCar(
+        new mongoose.Types.ObjectId(bookingId),
+        endTime
+      );
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        message: "Car returned successfully",
+        data: updatedBooking,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new BookingController();

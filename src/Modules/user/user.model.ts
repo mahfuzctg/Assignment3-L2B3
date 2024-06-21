@@ -38,6 +38,13 @@ userSchema.post("save", function (doc: { password: string }, next: () => void) {
   next();
 });
 
+// hide password field
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
+};
+//
 // Static method to find user by email
 userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await this.findOne({ email });
