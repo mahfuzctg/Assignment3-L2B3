@@ -1,4 +1,3 @@
-// booking.model.ts
 import mongoose, { Schema } from "mongoose";
 import { IBooking } from "./booking.interface";
 
@@ -9,7 +8,7 @@ const BookingSchema: Schema = new Schema(
     endTime: { type: String, default: null },
     user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     car: { type: mongoose.Types.ObjectId, ref: "Car", required: true },
-    totalCost: { type: Number, required: true },
+    totalCost: { type: Number, default: 0 },
   },
   {
     timestamps: true,
