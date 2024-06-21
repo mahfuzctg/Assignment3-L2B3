@@ -21,7 +21,7 @@ const userSchema = new Schema<TUser, UserModel>(
   }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next: () => void) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this; // doc
   // hashing password and save into DB
@@ -32,24 +32,19 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// // set '' after saving password
-// userSchema.post("save", function (doc, next) {
-//   doc.password = "";
-//   next();
-// });
-userSchema.methods.toJSON = function () {
-  const userObject = this.toObject();
-  delete userObject.password;
-  return userObject;
-};
+// set '' after saving password
+userSchema.post("save", function (doc: { password: string }, next: () => void) {
+  doc.password = "";
+  next();
+});
 
 // Static method to find user by email
 userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await this.findOne({ email });
 };
 userSchema.statics.isPasswordMatched = async function (
-  plainTextPassword,
-  hashedPassword
+  plainTextPassword: string | Buffer,
+  hashedPassword: string
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };

@@ -3,15 +3,13 @@ import { Model } from "mongoose";
 import { USER_ROLE } from "./user.constant";
 
 export type TUser = {
+  _id: any;
   name: string;
   email: string;
   password: string;
   phone: string;
   role: "admin" | "user";
   address: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  isPasswordMatched: (enteredPassword: string) => Promise<boolean>;
 };
 
 export interface UserModel extends Model<TUser> {

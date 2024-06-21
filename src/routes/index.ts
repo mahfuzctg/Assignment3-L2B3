@@ -1,10 +1,11 @@
 // src/routes/index.ts
 import { Router } from "express";
-import { AuthRoutes } from "../Modules/auth/auth.route";
 
-import { BookingRoutes } from "../Modules/booking/booking.route";
-import { CarRoutes } from "../Modules/car/car.route";
-import { UserRoutes } from "../Modules/user/user.route";
+import { AuthRoutes } from "../modules/auth/auth.route";
+
+import { BookingRoutes } from "../modules/booking/booking.route";
+import { CarRoutes } from "../modules/car/car.route";
+import { UserRoutes } from "../modules/user/user.route";
 
 const router = Router();
 

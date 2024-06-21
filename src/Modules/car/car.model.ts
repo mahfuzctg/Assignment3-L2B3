@@ -1,29 +1,15 @@
-// src/modules/car/car.model.ts
+import { Schema, model } from "mongoose";
+import { TCar } from "./car.interface";
 
-import { Document, Schema, model } from "mongoose";
-
-export interface CarDocument extends Document {
-  name: string;
-  description: string;
-  color: string;
-  isElectric: boolean;
-  features: string[];
-  pricePerHour: number;
-  status: string;
-  isDeleted: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const carSchema = new Schema<CarDocument>(
+const carSchema = new Schema<TCar>(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
     color: { type: String, required: true },
     isElectric: { type: Boolean, required: true },
+    status: { type: String, required: false },
     features: { type: [String], required: true },
     pricePerHour: { type: Number, required: true },
-    status: { type: String, default: "available" },
     isDeleted: { type: Boolean, default: false },
   },
   {
@@ -31,4 +17,4 @@ const carSchema = new Schema<CarDocument>(
   }
 );
 
-export const Car = model<CarDocument>("Car", carSchema);
+export const Car = model<TCar>("Car", carSchema);

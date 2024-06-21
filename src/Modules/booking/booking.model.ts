@@ -1,29 +1,48 @@
-// src/modules/booking/booking.model.ts
-import { Document, Schema, model } from "mongoose";
+import mongoose from "mongoose";
 
-export interface BookingDocument extends Document {
-  car: string;
-  date: Date;
-  startTime: string;
-  endTime?: Date;
-  user: string;
-  totalCost: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const bookingSchema = new Schema(
+// Define the schema for the Booking model
+const BookingSchema = new mongoose.Schema(
   {
-    car: { type: Schema.Types.ObjectId, ref: "Car", required: true },
-    date: { type: Date, required: true },
-    startTime: { type: String, required: true },
-    endTime: { type: Date },
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    totalCost: { type: Number, default: 0 },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    // Reference to the User model for the user who made the booking
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Refers to the User model
+      required: true,
+    },
+    // Reference to the Car model for the car that was booked
+    car: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Car", // Refers to the Car model
+      required: true,
+    },
+    // Date of the booking
+    date: {
+      type: String,
+      required: true,
+    },
+    // Start time of the booking
+    startTime: {
+      type: String,
+      required: true,
+    },
+    // End time of the booking, defaults to null
+    endTime: {
+      type: String,
+      default: null,
+    },
+    // Total cost of the booking, defaults to 0
+    totalCost: {
+      type: Number,
+      default: 0,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true, // Adds createdAt and updatedAt fields automatically
+  }
 );
 
-export const Booking = model<BookingDocument>("Booking", bookingSchema);
+// Create the Booking model using the defined schema
+const Booking = mongoose.model("Booking", BookingSchema);
+
+// Export the Booking model
+export default Booking;

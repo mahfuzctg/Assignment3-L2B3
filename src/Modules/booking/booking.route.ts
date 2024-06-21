@@ -1,12 +1,12 @@
-// src/modules/booking/booking.route.ts
+import express from "express";
 
-import { Router } from "express";
-import auth from "../../middlewares/auth"; // Ensure correct path to auth middleware
-import { createBooking, getAllBookings } from "./booking.controller";
+import auth from "../../middlewares/auth";
+import { USER_ROLE } from "../user/user.constant"; // Adjust the import path as per your actual structure
+import BookingController from "./booking.controller";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/", auth("user"), createBooking);
-router.get("/", auth("admin"), getAllBookings);
+router.get("/", auth(USER_ROLE.admin), BookingController.getAllBookings);
+router.post("/", auth(USER_ROLE.user), BookingController.bookCar);
 
-export default router;
+export const BookingRoutes = router;

@@ -1,36 +1,14 @@
-// /* eslint-disable @typescript-eslint/consistent-type-definitions */
-// // src/interfaces/booking.interface.ts
+import { Document } from "mongoose";
+import { TCar } from "../car/car.interface";
+import { TUser } from "../user/user.interface";
 
-// import { Types } from "mongoose";
-
-// export type VehicleType =
-//   | "car"
-//   | "truck"
-//   | "SUV"
-//   | "van"
-//   | "motorcycle"
-//   | "bus"
-//   | "electricVehicle"
-//   | "hybridVehicle"
-//   | "bicycle"
-//   | "tractor";
-
-// // export interface TBooking {
-// //   customer: Types.ObjectId;
-// //   car: Types.ObjectId;
-// //   vehicleType: VehicleType;
-// //   vehicleBrand: string;
-// //   vehicleModel: string;
-// //   manufacturingYear: number;
-// //   registrationPlate: string;
-// // }
-
-// // export interface TBookingRequest {
-// //   carId: Types.ObjectId;
-// //   slotId: Types.ObjectId;
-// //   vehicleType: VehicleType;
-// //   vehicleBrand: string;
-// //   vehicleModel: string;
-// //   manufacturingYear: number;
-// //   registrationPlate: string;
-// // }
+export interface IBooking extends Document {
+  date: string;
+  startTime: string;
+  endTime: string | null;
+  user: TUser["_id"];
+  car: TCar["_id"];
+  totalCost: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
