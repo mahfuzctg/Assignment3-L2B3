@@ -39,6 +39,10 @@ const auth = (...requiredRoles: TUserRole[]) => {
         });
       }
 
+      // logging for debugging
+      console.log("Required Roles:", requiredRoles);
+      console.log("User Role:", role);
+
       // checking if the user's role is allowed
       if (requiredRoles.length && !requiredRoles.includes(role)) {
         return res.status(httpStatus.FORBIDDEN).json({

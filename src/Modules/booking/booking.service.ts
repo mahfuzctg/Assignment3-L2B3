@@ -1,46 +1,82 @@
 import mongoose from "mongoose";
-import Booking from "./booking.model";
+import Booking, { IBooking } from "./booking.model";
 
-const bookCar = async (
-  userId: mongoose.Types.ObjectId,
-  carId: mongoose.Types.ObjectId,
-  date: string,
-  startTime: string
-) => {
-  try {
-    console.log("Creating booking:", { userId, carId, date, startTime });
-    const booking = new Booking({
-      user: userId,
-      car: carId,
-      date,
-      startTime,
-      endTime: null, // default to null
-      totalCost: 0, // default to 0
-    });
-    const result = await booking.save();
-    console.log("Booking created:", result);
-    return result;
-  } catch (error) {
-    console.error("Error booking car:", error);
-    throw new Error(`Could not book car: ${error.message}`);
+class BookingService {
+  async getUserBookings(userId: mongoose.Types.ObjectId): Promise<IBooking[]> {
+    try {
+      const bookings = await Booking.find({ user: userId })
+        .populate("user", "_id name email role phone address")
+        .populate(
+          "car",
+          "_id name description color isElectric features pricePerHour status isDeleted createdAt updatedAt"
+        )
+        .exec();
+      return bookings;
+    } catch (error) {
+      throw new Error(`Could not fetch user bookings: ${error.message}`);
+    }
   }
-};
 
-const getAllBookings = async (carId: mongoose.Types.ObjectId, date: string) => {
-  try {
-    console.log("Fetching bookings for:", { carId, date });
-    const bookings = await Booking.find({ car: carId, date }).populate(
-      "user car"
-    );
-    console.log("Bookings fetched:", bookings);
-    return bookings;
-  } catch (error) {
-    console.error("Error fetching bookings:", error);
-    throw new Error(`Could not get bookings: ${error.message}`);
+  async getAllBookings(
+    carId: mongoose.Types.ObjectId,
+    date: string
+  ): Promise<IBooking[]> {
+    try {
+      const bookings = await Booking.find({ car: carId, date })
+        .populate("user", "_id name email role phone address")
+        .populate(
+          "car",
+          "_id name description color isElectric features pricePerHour status isDeleted createdAt updatedAt"
+        )
+        .exec();
+      return bookings;
+    } catch (error) {
+      throw new Error(`Could not fetch bookings: ${error.message}`);
+    }
   }
-};
 
-export default {
-  bookCar,
-  getAllBookings,
-};
+  async bookCar(
+    userId: mongoose.Types.ObjectId,
+    carId: mongoose.Types.ObjectId,
+    date: string,
+    startTime: string
+  ): Promise<IBooking> {
+    try {
+      const newBooking = new Booking({
+        user: userId,
+        car: carId,
+        date,
+        startTime,
+        endTime: null,
+        totalCost: 0, // Assume totalCost is calculated later
+      });
+      await newBooking.save();
+      return newBooking;
+    } catch (error) {
+      throw new Error(`Could not book car: ${error.message}`);
+    }
+  }
+
+  async returnCar(
+    bookingId: mongoose.Types.ObjectId,
+    endTime: string
+  ): Promise<IBooking | null> {
+    try {
+      const updatedBooking = await Booking.findByIdAndUpdate(
+        bookingId,
+        { endTime },
+        { new: true }
+      ).exec();
+
+      if (!updatedBooking) {
+        throw new Error("Booking not found");
+      }
+
+      return updatedBooking;
+    } catch (error) {
+      throw new Error(`Could not return car: ${error.message}`);
+    }
+  }
+}
+
+export default new BookingService();

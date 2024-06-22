@@ -1,82 +1,82 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import httpStatus from "http-status";
-import { handleNoDataResponse } from "../../errors/handleNoData";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
+import { CarService } from "./car.service";
 
-import { TCar } from "./car.interface";
-import { carServices } from "./car.service";
-
-const createCar = catchAsync(async (req: Request, res: Response) => {
-  const carData: TCar = req.body;
-  const result = await carServices.createCarIntoDb(carData);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Car created successfully!",
-    data: result,
-  });
-});
-
-const getSingleCar = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await carServices.getSingleCarFromDB(id);
-  if (!result) {
-    return handleNoDataResponse(res);
+class CarController {
+  async createCar(req: Request, res: Response): Promise<void> {
+    try {
+      const car = await CarService.createCarIntoDb(req.body);
+      res.status(201).json({ success: true, data: car });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
   }
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Car is retrieved successfully",
-    data: result,
-  });
-});
-
-const getAllCars = catchAsync(async (req: Request, res: Response) => {
-  const result = await carServices.getAllCars();
-  if (result.length === 0) {
-    return handleNoDataResponse(res);
+  async getSingleCar(req: Request, res: Response): Promise<void> {
+    try {
+      const car = await CarService.getSingleCarFromDB(req.params.id);
+      if (!car) {
+        res.status(404).json({ success: false, message: "Car not found" });
+        return;
+      }
+      res.status(200).json({ success: true, data: car });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
   }
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Cars are retrieved successfully",
-    data: result,
-  });
-});
+  async getAllCars(req: Request, res: Response): Promise<void> {
+    try {
+      const cars = await CarService.getAllCars();
+      res.status(200).json({ success: true, data: cars });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
 
-const updateCar = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const car: Partial<TCar> = req.body;
-  const result = await carServices.updateCarIntoDB(id, car);
+  async updateCar(req: Request, res: Response): Promise<void> {
+    try {
+      const car = await CarService.updateCarIntoDB(req.params.id, req.body);
+      res.status(200).json({ success: true, data: car });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Car is updated successfully",
-    data: result,
-  });
-});
+  async deleteCar(req: Request, res: Response): Promise<void> {
+    try {
+      const car = await CarService.deleteCarFromDB(req.params.id);
+      res.status(200).json({ success: true, data: car });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
 
-const deleteCar = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await carServices.deleteCarFromDB(id);
+  async returnCar(req: Request, res: Response): Promise<void> {
+    const { bookingId, endTime } = req.body;
+    if (!bookingId || !endTime) {
+      res.status(400).json({
+        success: false,
+        message: "bookingId and endTime are required in the request body",
+      });
+      return;
+    }
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Car is deleted successfully",
-    data: result,
-  });
-});
+    try {
+      const updatedBooking = await CarService.returnCar(bookingId, endTime);
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        message: "Car returned successfully",
+        data: updatedBooking,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+}
 
-export const carControllers = {
-  createCar,
-  getSingleCar,
-  getAllCars,
-  updateCar,
-  deleteCar,
-};
+export const carControllers = new CarController();

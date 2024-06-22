@@ -1,24 +1,19 @@
+// booking.model.ts
 import mongoose, { Schema } from "mongoose";
+import { IBooking } from "./booking.interface";
 
-// Define Booking Schema
-const BookingSchema = new Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Refers to the User model
-    required: true,
+const BookingSchema: Schema = new Schema(
+  {
+    date: { type: String, required: true },
+    startTime: { type: String, required: true },
+    endTime: { type: String, default: null },
+    user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+    car: { type: mongoose.Types.ObjectId, ref: "Car", required: true },
+    totalCost: { type: Number, required: true },
   },
-  car: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Car", // Refers to the Car model
-    required: true,
-  },
-  date: String,
-  startTime: String,
-  endTime: String,
-  totalCost: Number,
-});
+  {
+    timestamps: true,
+  }
+);
 
-// Create Booking model
-const Booking = mongoose.model("Booking", BookingSchema);
-
-export default Booking;
+export default mongoose.model<IBooking>("Booking", BookingSchema);

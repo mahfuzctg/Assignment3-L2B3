@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
-import { Schema, model } from "mongoose";
+import { Document, Model, Schema, model } from "mongoose";
 import config from "../../config";
 import { TUser, UserModel } from "./user.interface";
 
+// Define user schema
 const userSchema = new Schema<TUser, UserModel>(
   {
     name: { type: String, required: true },
@@ -21,39 +22,46 @@ const userSchema = new Schema<TUser, UserModel>(
   }
 );
 
-userSchema.pre("save", async function (next: () => void) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this; // doc
-  // hashing password and save into DB
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
-  );
-  next();
+// Middleware to hash password before saving
+userSchema.pre("save", async function (next) {
+  const user = this as TUser & Document;
+  if (!user.isModified("password")) {
+    return next();
+  }
+  try {
+    const hashedPassword = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+    user.password = hashedPassword;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 });
 
-// set '' after saving password
-userSchema.post("save", function (doc: { password: string }, next: () => void) {
-  doc.password = "";
-  next();
-});
-
-// hide password field
+// Middleware to remove password field from returned JSON
 userSchema.methods.toJSON = function () {
-  const userObject = this.toObject();
-  delete userObject.password;
-  return userObject;
+  const user = this.toObject();
+  delete user.password;
+  return user;
 };
-//
+
 // Static method to find user by email
 userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await this.findOne({ email });
 };
+
+// Static method to compare passwords
 userSchema.statics.isPasswordMatched = async function (
-  plainTextPassword: string | Buffer,
+  plainTextPassword: string,
   hashedPassword: string
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-export const User = model<TUser, UserModel>("user", userSchema);
+// Export User model
+export const User: Model<TUser & Document> = model<TUser & Document, UserModel>(
+  "User",
+  userSchema
+);

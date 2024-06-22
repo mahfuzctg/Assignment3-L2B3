@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { USER_ROLE } from "./user.constant";
 
 export type TUser = {
-  _id: any;
+  _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
   password: string;

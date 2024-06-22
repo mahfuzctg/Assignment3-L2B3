@@ -7,16 +7,20 @@ import { CarValidations } from "./car.validation";
 
 const router = express.Router();
 
-// car creating route
-// Create a car
+// Return the car (accessible only to admin)
+router.put("/return", auth(USER_ROLE.admin), carControllers.returnCar);
+
+// Car creating route
 router.post(
   "/",
   auth(USER_ROLE.admin),
   validateRequest(CarValidations.createCarValidationSchema),
   carControllers.createCar
 );
+
 // Get a car
 router.get("/:id", carControllers.getSingleCar);
+
 // Update a car
 router.put(
   "/:id",
@@ -24,8 +28,10 @@ router.put(
   validateRequest(CarValidations.updateCarValidationSchema),
   carControllers.updateCar
 );
+
 // Delete a car
 router.delete("/:id", auth(USER_ROLE.admin), carControllers.deleteCar);
+
 // Get all cars
 router.get("/", carControllers.getAllCars);
 
