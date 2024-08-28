@@ -1,18 +1,20 @@
 import { Request, Response } from 'express';
+import catchAsync from '../../utils/catchAsync';
+
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
-import catchAsync from '../../utils/catchAsync';
+import { AuthError } from '../../errors/authError';
 import sendResponse from '../../utils/sendResponse';
 
 import AppError from '../../errors/appError';
-import { AuthError } from '../../errors/authError';
 import { User } from '../user/user.model';
 import { BookingServices } from './booking.service';
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
   const { carId, ...bookingData } = req.body;
   bookingData.car = carId;
+
   const userToken = req.headers.authorization?.split(' ')[1];
   if (!userToken) {
     return AuthError(req, res);
@@ -24,9 +26,11 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
   ) as JwtPayload;
 
   const user = await User.findOne({ email: decoded.email });
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
+
   const bookingObj = {
     ...bookingData,
     user: user?._id,
@@ -46,18 +50,20 @@ const getAllBookings = catchAsync(async (req: Request, res: Response) => {
   const { carId, date } = req.query;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const queryObj: any = {};
+
   if (req.query.carId) {
     queryObj.car = carId;
   }
   if (req.query.date) {
     queryObj.date = date;
   }
-
   if (req.query.carId && req.query.date) {
     queryObj.car = carId;
     queryObj.date = date;
   }
+
   const result = await BookingServices.getAllBookings(queryObj);
+
   if (!result || result.length === 0) {
     res.status(httpStatus.NOT_FOUND).json({
       success: false,

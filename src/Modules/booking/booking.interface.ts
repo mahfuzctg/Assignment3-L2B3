@@ -1,10 +1,10 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
-export interface IBooking {
+export type TBooking = {
   date: string;
   startTime: string;
   endTime: string;
   user: Types.ObjectId;
   car: Types.ObjectId;
   totalCost: number;
-}
+};

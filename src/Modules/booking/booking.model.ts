@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
-import { IBooking } from "./booking.interface";
+import { Schema, model } from 'mongoose';
+import { TBooking } from './booking.interface';
 
-const bookingSchema = new Schema<IBooking>(
+const bookingSchema = new Schema<TBooking>(
   {
     date: {
       type: String,
@@ -9,12 +9,12 @@ const bookingSchema = new Schema<IBooking>(
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     car: {
       type: Schema.Types.ObjectId,
-      ref: "Car",
+      ref: 'Car',
       required: true,
     },
     startTime: {
@@ -32,7 +32,7 @@ const bookingSchema = new Schema<IBooking>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export const Booking = model<IBooking>("Booking", bookingSchema);
+export const Booking = model<TBooking>('Booking', bookingSchema);
