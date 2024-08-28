@@ -1,9 +1,33 @@
-import { Schema, model } from "mongoose";
-import { TCar } from "./car.interface";
+import { Schema, model } from 'mongoose';
+import { TCar } from './car.interface';
 
 const carModelSchema = new Schema(
   {
     name: {
+      type: String,
+      required: true,
+    },
+    model: {
+      type: String,
+      required: true,
+    },
+    year: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    ownerEmail: {
+      type: String,
+      required: true,
+    },
+    ownerName: {
       type: String,
       required: true,
     },
@@ -21,7 +45,7 @@ const carModelSchema = new Schema(
     },
     status: {
       type: String,
-      default: "available",
+      default: 'available',
     },
     features: {
       type: [String],
@@ -38,7 +62,7 @@ const carModelSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export const Car = model<TCar>("Car", carModelSchema);
+export const Car = model<TCar>('Car', carModelSchema);

@@ -16,7 +16,7 @@ app.use(cors({}));
 app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome back to the server!');
+  res.send('Welcome to the car rental backend server!');
 });
 
 app.use(globalErrorHandler);

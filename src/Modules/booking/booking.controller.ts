@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import catchAsync from '../../utils/catchAsync';
-
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
-import { AuthError } from '../../errors/authError';
-import sendResponse from '../../utils/sendResponse';
-
 import AppError from '../../errors/appError';
+import { AuthError } from '../../errors/authError';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 import { User } from '../user/user.model';
 import { BookingServices } from './booking.service';
 
