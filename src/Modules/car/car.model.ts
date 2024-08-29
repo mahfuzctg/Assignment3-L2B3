@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose';
-import { TCar } from './car.interface';
+import { Schema, model, models } from 'mongoose';
+import { TCar } from '../car/car.interface';
 
 const carModelSchema = new Schema<TCar>(
   {
@@ -77,4 +77,4 @@ const carModelSchema = new Schema<TCar>(
   },
 );
 
-export const Car = model<TCar>('Car', carModelSchema);
+export const Car = models.Car || model<TCar>('Car', carModelSchema);

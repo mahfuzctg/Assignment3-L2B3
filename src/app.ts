@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      'https://assignment3-phi-fawn.vercel.app',
+      'https://assignment3-phi-fawn.vercel.app/api',
       'http://localhost:5173',
       'https://car-rental-reservation.netlify.app',
     ],

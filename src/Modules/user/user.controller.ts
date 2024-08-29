@@ -1,72 +1,79 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import httpStatus from 'http-status';
+import { handleNoDataResponse } from '../../errors/handleNoData';
 import catchAsync from '../../utils/catchAsync';
+import { getUserInfoFromToken } from '../../utils/getUserInfoFromToken';
 import sendResponse from '../../utils/sendResponse';
+import { User } from './user.model';
+import { userServices } from './user.service';
 
-import { Request, Response } from 'express';
-import { UserServices } from './user.service';
-
-const getAllUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.getAllUserFromDB();
-
-  if (!result) {
-    res.status(httpStatus.NOT_FOUND).json({
-      success: false,
-      statusCode: httpStatus.NOT_FOUND,
-      message: 'No Data Found',
-      data: [],
-    });
-  }
+const createUser = catchAsync(async (req, res) => {
+  const userData = req.body;
+  const result = await userServices.createUserIntoDb(userData);
   sendResponse(res, {
-    success: true,
     statusCode: httpStatus.OK,
-    message: 'Users retrieved successfully',
-    data: result,
-  });
-});
-const updateUserRole = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const role = req.body.role;
-
-  const result = await UserServices.updateUserRoleIntoDB(id, role);
-
-  if (!result) {
-    res.status(httpStatus.NOT_FOUND).json({
-      success: false,
-      statusCode: httpStatus.NOT_FOUND,
-      message: 'No Data Found',
-      data: [],
-    });
-  }
-  sendResponse(res, {
     success: true,
-    statusCode: httpStatus.OK,
-    message: 'User role updated successfully',
-    data: result,
-  });
-});
-const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  const result = await UserServices.deleteUserRoleIntoDB(id);
-
-  if (!result) {
-    res.status(httpStatus.NOT_FOUND).json({
-      success: false,
-      statusCode: httpStatus.NOT_FOUND,
-      message: 'User Not Found',
-      data: [],
-    });
-  }
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'User deleted successfully',
+    message: 'User registered successfully',
     data: result,
   });
 });
 
-export const UserController = {
+const getAllUser = catchAsync(async (req, res) => {
+  const result = await User.find();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User retrieved successfully',
+    data: result,
+  });
+});
+const getUserByEmail = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const { email } = getUserInfoFromToken(token as string);
+  const result = await userServices.getUserFromDB(email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User retrieved successfully',
+    data: result,
+  });
+});
+
+const updateUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const payload = req.body;
+  const result = await userServices.updateUserIntoDB(id, payload);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User updated successfully',
+    data: result,
+  });
+});
+
+const getMyBookings = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const { email } = getUserInfoFromToken(token as string);
+
+  const result = await userServices.getMyBookingsFromDb(email);
+
+  if (!result || result?.length === 0) {
+    return handleNoDataResponse(res);
+  }
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User bookings retrieved successfully',
+    data: result,
+  });
+});
+
+export const userControllers = {
+  createUser,
+  getMyBookings,
   getAllUser,
-  updateUserRole,
-  deleteUser,
+  getUserByEmail,
+  updateUser,
 };
