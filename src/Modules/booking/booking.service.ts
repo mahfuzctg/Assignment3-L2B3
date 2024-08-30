@@ -1,7 +1,6 @@
 import httpStatus from 'http-status';
-
-import AppError from '../../errors/appError';
-import { Car } from '../car/car.model';
+import AppError from '../../errors/AppError';
+import { Car } from '../Car/car.model';
 import { TBooking } from './booking.interface';
 import { Booking } from './booking.model';
 

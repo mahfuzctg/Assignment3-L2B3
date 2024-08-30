@@ -1,4 +1,3 @@
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 
@@ -13,11 +12,14 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ['https://assignment3-phi-fawn.vercel.app/'],
+    origin: [
+      'https://assignment3-phi-fawn.vercel.app',
+      'http://localhost:5173',
+      'https://car-rental-reservation.netlify.app',
+    ],
     credentials: true,
   }),
 );
-app.use(cookieParser());
 
 //application routes
 app.use('/api', router);

@@ -16,8 +16,8 @@ const carModelSchema = new Schema<TCar>(
       required: false, // Optional
     },
     date: {
-      type: String,
-      required: false, // Optional
+      type: Date,
+      required: false, // Optional (can change to true if necessary)
     },
     image: {
       type: String,

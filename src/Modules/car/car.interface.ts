@@ -13,6 +13,9 @@ export type TCar = {
   features?: string[]; // Optional
   pricePerHour?: number; // Optional
   isDeleted?: boolean; // Optional
+  date?: Date | undefined;
+  carType: string;
+  seatCapacity: number;
 };
 
 export type TReturnCar = {

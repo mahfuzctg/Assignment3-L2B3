@@ -3,14 +3,14 @@ import { auth } from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLES } from '../user/user.constant';
 import { BookingController } from './booking.controller';
-import { BookingValidation } from './booking.validation';
+import { BookingValidations } from './booking.validation';
 
 const router = Router();
 
 router.post(
   '/',
   auth(USER_ROLES.user),
-  validateRequest(BookingValidation.createBookingValidationSchema),
+  validateRequest(BookingValidations.createBookingValidationSchema),
   BookingController.createBooking,
 );
 
