@@ -1,5 +1,4 @@
 import httpStatus from 'http-status';
-
 import mongoose from 'mongoose';
 import AppError from '../../errors/appError';
 import { convertTimeToHours } from '../../utils/TimeHoursConverted';
