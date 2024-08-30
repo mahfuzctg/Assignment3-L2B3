@@ -1,24 +1,35 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Application, Request, Response } from 'express';
+import express from 'express';
+
 import globalErrorHandler from './middlewares/globalErrorhandler';
 import notFound from './middlewares/notFound';
 import router from './routes';
 
-const app: Application = express();
+//Create the Express.js application
+const app = express();
 
-//parsers
+// Set up the middleware
 app.use(express.json());
-// app.use(cookieParser());
+app.use(
+  cors({
+    origin: ['https://assignment3-phi-fawn.vercel.app/'],
+    credentials: true,
+  }),
+);
+app.use(cookieParser());
 
-app.use(cors({}));
-
-// application routes
+//application routes
 app.use('/api', router);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to the car rental backend server!');
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome To Car Rental Service!',
+  });
 });
 
 app.use(globalErrorHandler);
+
 app.use(notFound);
+
 export default app;

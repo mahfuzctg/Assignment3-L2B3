@@ -1,47 +1,59 @@
 import { Schema, model } from 'mongoose';
 import { TCar } from './car.interface';
 
-const carModelSchema = new Schema(
+const carModelSchema = new Schema<TCar>(
   {
     name: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     model: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     year: {
       type: String,
-      required: true,
+      required: false, // Optional
+    },
+    date: {
+      type: String,
+      required: false, // Optional
     },
     image: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     location: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     ownerEmail: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     ownerName: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     description: {
       type: String,
-      required: true,
+      required: false, // Optional
     },
     color: {
       type: String,
-      required: true,
+      required: false, // Optional
+    },
+    carType: {
+      type: String,
+      required: false, // Optional
+    },
+    seatCapacity: {
+      type: Number,
+      required: false, // Optional
     },
     isElectric: {
       type: Boolean,
-      required: true,
+      required: false, // Optional
     },
     status: {
       type: String,
@@ -49,11 +61,11 @@ const carModelSchema = new Schema(
     },
     features: {
       type: [String],
-      required: true,
+      required: false, // Optional
     },
     pricePerHour: {
       type: Number,
-      required: true,
+      required: false, // Optional
     },
     isDeleted: {
       type: Boolean,

@@ -1,18 +1,18 @@
 export type TCar = {
-  name: string;
-  model: string;
-  year: string;
-  image: string;
-  location: string;
-  ownerEmail: string;
-  OwnerName: string;
-  description: string;
-  color: string;
-  isElectric: boolean;
-  status: string;
-  features: string[];
-  pricePerHour: number;
-  isDeleted: boolean;
+  name?: string; // Optional
+  model?: string; // Optional
+  year?: string; // Optional
+  image?: string; // Optional
+  location?: string; // Optional
+  ownerEmail?: string; // Optional
+  ownerName?: string; // Corrected property name to match typical casing conventions
+  description?: string; // Optional
+  color?: string; // Optional
+  isElectric?: boolean; // Optional
+  status?: string; // Optional
+  features?: string[]; // Optional
+  pricePerHour?: number; // Optional
+  isDeleted?: boolean; // Optional
 };
 
 export type TReturnCar = {
