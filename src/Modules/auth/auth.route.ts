@@ -9,7 +9,7 @@ const router = Router();
 
 router.post(
   "/signup",
-  validateRequest(UserValidations.userValidationSchema),
+  validateRequest(UserValidations.createUserValidationSchema),
   AuthController.register
 );
 

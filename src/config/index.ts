@@ -21,4 +21,5 @@ export default {
   signature_key: process.env.SIGNATURE_KEY,
   payment_url: process.env.PAYMENT_URL,
   payment_verify_url: process.env.PAYMENT_VERIFY_URL,
+  cancel_url: process.env.CANCEL_URL
 };

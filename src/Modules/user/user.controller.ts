@@ -11,7 +11,7 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Users retrieved successfully',
-    data: result,
+    data: result, 
   });
 });
 
@@ -63,31 +63,51 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const updatedInfo = req.body;
-  const requesterId = req.user.id; // ID from authenticated user
-  const requesterRole = req.user.role; // Role from authenticated user
 
-  try {
-    const result = await UserServices.updateUserInDB(id, updatedInfo, requesterId, requesterRole);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: 'User updated successfully',
-      data: result,
-    });
-  } catch (error) {
+  if (!id || !updatedInfo) {
     return sendResponse(res, {
       success: false,
-      statusCode: httpStatus.FORBIDDEN,
-      message: error.message,
+      statusCode: httpStatus.BAD_REQUEST,
+      message: 'User ID and updated information are required',
       data: null,
     });
   }
+
+  const requesterId = req.user?.id; 
+  const requesterRole = req.user?.role; 
+
+  const result = await UserServices.updateUserInDB(id, updatedInfo, requesterId, requesterRole);
+
+  if (!result) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: 'User not found or not updated',
+      data: null,
+    });
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User updated successfully',
+    data: result,
+  });
 });
 
 // Update a user's role
 const updateUserRole = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const role = req.body.role;
+  const { role } = req.body;
+
+  if (!id || !role) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.BAD_REQUEST,
+      message: 'User ID and role are required',
+      data: null,
+    });
+  }
 
   const result = await UserServices.updateUserRoleInDB(id, role);
 
@@ -111,7 +131,16 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
 // Update a user's status
 const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { isActive } = req.body; // Expecting isActive in the request body
+  const { isActive } = req.body; 
+
+  if (typeof isActive !== 'boolean') {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.BAD_REQUEST,
+      message: 'isActive should be a boolean value',
+      data: null,
+    });
+  }
 
   const result = await UserServices.toggleUserStatusInDB(id, isActive);
 
@@ -146,7 +175,7 @@ const toggleUserStatus = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  const updatedUser = await UserServices.toggleUserStatusInDB(id, user.isActive);
+  const updatedUser = await UserServices.toggleUserStatusInDB(id, !user.isActive); 
 
   sendResponse(res, {
     success: true,
@@ -205,7 +234,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 
 // Fetch bookings for the authenticated user
 const getMyBookings = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user.id; // Assuming req.user is populated by auth middleware
+  const userId = req.user?.id; // Ensure req.user is populated by auth middleware
   const bookings = await UserServices.getBookingsByUserId(userId);
 
   sendResponse(res, {
@@ -218,7 +247,7 @@ const getMyBookings = catchAsync(async (req: Request, res: Response) => {
 
 // Fetch user information based on authenticated user email
 const getUserByEmail = catchAsync(async (req: Request, res: Response) => {
-  const email = req.user.email; // Assuming req.user is populated by auth middleware
+  const email = req.user?.email; // Ensure req.user is populated by auth middleware
 
   if (!email) {
     return sendResponse(res, {

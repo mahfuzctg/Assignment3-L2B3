@@ -3,13 +3,14 @@ import { User } from './user.model';
 
 // Fetch all users
 const getAllUserFromDB = async () => {
-  return await User.find({}); // Fetch all users without filtering by isDeleted
+  return await User.find(); 
 };
 
 // Fetch a user by email
 const getUserFromDB = async (email: string) => {
   return await User.findOne({ email });
 };
+
 
 // Create a new user
 const createUserInDB = async (payload: Record<string, unknown>) => {

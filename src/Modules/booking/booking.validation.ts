@@ -18,8 +18,8 @@ const createBookingValidationSchema = z.object({
         },
       ),
 
-    car: z.string({
-      required_error: 'Car ID is required',
+    carId: z.string({
+      required_error: 'Car ID  required',
       invalid_type_error: 'Car ID must be a string',
     }),
 
