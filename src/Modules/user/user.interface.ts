@@ -5,4 +5,5 @@ export type TUser = {
   password: string;
   phone: string;
   isDeleted: boolean;
+  
 };

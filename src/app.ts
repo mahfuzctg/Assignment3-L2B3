@@ -1,23 +1,33 @@
 import cors from 'cors';
 import express from 'express';
-
 import globalErrorHandler from './middlewares/globalErrorhandler';
 import notFound from './middlewares/notFound';
 import router from './routes';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 // Middleware setup
+
 app.use(express.json());
-app.use(
-  cors({
+app.use(cookieParser());
+
+app.use( cors({
     origin: [
-      'https://assignment3-phi-fawn.vercel.app', // Allow your frontend
-      'http://localhost:5173', // Allow local development
+      'https://assignment3-phi-fawn.vercel.app', 
+      'http://localhost:5173', 
+     
     ],
-    credentials: true, // Optional: set to true if using credentials
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'], 
+    credentials: true, 
   }),
 );
+
+// Logging middleware to trace incoming requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Application routes
 app.use('/api', router);

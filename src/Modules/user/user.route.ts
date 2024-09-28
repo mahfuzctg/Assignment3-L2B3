@@ -16,7 +16,7 @@ router.get('/', auth(USER_ROLES.admin), UserController.getAllUser);
 router.get('/my-bookings', auth(USER_ROLES.user), UserController.getMyBookings);
 
 // Get user info by email (admin or user)
-router.get('/user-info', auth(USER_ROLES.user), UserController.getUserByEmail);
+router.get('/user-info/:email', auth(USER_ROLES.user), UserController.getUserByEmail); // Updated route
 
 // Create a new user (admin only)
 router.post(
@@ -26,10 +26,10 @@ router.post(
   UserController.createUser,
 );
 
-// Update a user by ID (admin only)
+// Update a user by ID 
 router.put(
   '/:id',
-  auth(USER_ROLES.admin),
+  auth(USER_ROLES.user), // Ensure this is correct based on your logic
   validateRequest(UserValidations.updateUserValidationSchema),
   UserController.updateUser,
 );
@@ -41,11 +41,11 @@ router.patch(
   UserController.updateUserRole,
 );
 
-// Update user status by ID (admin only) - new route added
+// Update user status by ID (admin only)
 router.patch(
   '/:id/status',
   auth(USER_ROLES.admin),
-  UserController.updateUserStatus, // Ensure you have a corresponding controller function
+  UserController.updateUserStatus,
 );
 
 // Delete a user by ID (admin only)

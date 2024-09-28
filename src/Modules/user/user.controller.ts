@@ -2,13 +2,11 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-
 import { UserServices } from './user.service';
 
 // Fetch all users
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.getAllUserFromDB();
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -52,9 +50,7 @@ const getUser = catchAsync(async (req: Request, res: Response) => {
 // Create a new user
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const newUser = req.body;
-
   const result = await UserServices.createUserInDB(newUser);
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -67,24 +63,25 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const updatedInfo = req.body;
+  const requesterId = req.user.id; // ID from authenticated user
+  const requesterRole = req.user.role; // Role from authenticated user
 
-  const result = await UserServices.updateUserInDB(id, updatedInfo);
-
-  if (!result) {
+  try {
+    const result = await UserServices.updateUserInDB(id, updatedInfo, requesterId, requesterRole);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'User updated successfully',
+      data: result,
+    });
+  } catch (error) {
     return sendResponse(res, {
       success: false,
-      statusCode: httpStatus.NOT_FOUND,
-      message: 'User not found or no changes made',
+      statusCode: httpStatus.FORBIDDEN,
+      message: error.message,
       data: null,
     });
   }
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'User updated successfully',
-    data: result,
-  });
 });
 
 // Update a user's role
@@ -116,7 +113,7 @@ const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const { isActive } = req.body; // Expecting isActive in the request body
 
-  const result = await UserServices.updateUserInDB(id, isActive);
+  const result = await UserServices.toggleUserStatusInDB(id, isActive);
 
   if (!result) {
     return sendResponse(res, {
@@ -149,10 +146,7 @@ const toggleUserStatus = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  const updatedUser = await UserServices.toggleUserStatusInDB(
-    id,
-    user.isActive,
-  );
+  const updatedUser = await UserServices.toggleUserStatusInDB(id, user.isActive);
 
   sendResponse(res, {
     success: true,
@@ -260,7 +254,7 @@ export const UserController = {
   createUser,
   updateUser,
   updateUserRole,
-  updateUserStatus, // Added update user status
+  updateUserStatus,
   toggleUserStatus,
   getActiveUsers,
   getBlockedUsers,

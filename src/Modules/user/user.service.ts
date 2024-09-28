@@ -21,12 +21,18 @@ const createUserInDB = async (payload: Record<string, unknown>) => {
 const updateUserInDB = async (
   userId: string,
   payload: Record<string, unknown>,
+  requesterId: string, // ID of the user making the request
+  requesterRole: string // Role of the user making the request
 ) => {
-  return await User.findOneAndUpdate(
-    { _id: userId }, // Removed isDeleted check
-    payload,
-    { new: true },
-  );
+  // Check if the requester is an admin or the user themselves
+  if (requesterRole === 'admin' || requesterId === userId) {
+    return await User.findOneAndUpdate(
+      { _id: userId }, // Removed isDeleted check
+      payload,
+      { new: true }
+    );
+  }
+  throw new Error('Unauthorized: You can only update your own information.');
 };
 
 // Update a user's role
@@ -34,7 +40,7 @@ const updateUserRoleInDB = async (userId: string, role: string) => {
   return await User.updateOne(
     { _id: userId }, // Removed isDeleted check
     { role },
-    { new: true },
+    { new: true }
   );
 };
 
@@ -43,7 +49,7 @@ const deleteUserFromDB = async (userId: string) => {
   return await User.updateOne(
     { _id: userId }, // Here, you might want to keep the logic for actual deletion or updating isDeleted to true
     { isDeleted: true }, // Mark user as deleted
-    { new: true },
+    { new: true }
   );
 };
 
@@ -52,7 +58,7 @@ const toggleUserStatusInDB = async (userId: string, isActive: boolean) => {
   return await User.updateOne(
     { _id: userId }, // Find user by ID
     { isActive: !isActive }, // Toggle isActive status
-    { new: true },
+    { new: true }
   );
 };
 

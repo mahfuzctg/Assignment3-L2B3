@@ -10,7 +10,7 @@ const router = Router();
 // Create a new booking (User only)
 router.post(
   '/',
-  auth(USER_ROLES.user), // Ensure the user is authenticated as a normal user
+  auth(USER_ROLES.user), // 
   validateRequest(BookingValidations.createBookingValidationSchema), // Validate request data
   BookingController.createBooking,
 );
@@ -25,7 +25,7 @@ router.get(
 // Retrieve bookings for the logged-in user
 router.get(
   '/my-bookings',
-  auth(USER_ROLES.user), // Ensure the user is authenticated as a normal user
+  auth(USER_ROLES.user), 
   BookingController.getUsersBooking,
 );
 
