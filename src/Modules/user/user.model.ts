@@ -5,54 +5,37 @@ import { TUser } from './user.interface';
 
 const userSchema = new Schema<TUser>(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
     role: {
       type: String,
       enum: ['user', 'admin'],
-      required: true,
+      default: 'user',
     },
-    password: {
-      type: String,
-      required: true,
-      select: 0,
-    },
-    phone: {
-      type: String,
-      required: true,
-    },
-    address: {
-      type: String,
-      required: true,
-    },
+    password: { type: String, required: true, select: 0 },
+    phone: { type: String, required: true },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   },
 );
 
+//pre save middleware / hook
 userSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-
-  //======== hashing password and save in database =====
-  user.password = await bcrypt.hash(
-    user.password,
+  //hashing password and save in database
+  this.password = await bcrypt.hash(
+    this.password,
     Number(config.bcrypt_salt_rounds),
   );
 
   next();
 });
-userSchema.methods.toJSON = function () {
-  const user = this.toObject();
-  delete user.password;
-  return user;
-};
+
+//remove password string after saving data
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
 
 export const User = model<TUser>('User', userSchema);

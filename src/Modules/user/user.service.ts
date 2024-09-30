@@ -1,44 +1,91 @@
 import { Booking } from '../booking/booking.model';
-import { TUser } from './user.interface';
 import { User } from './user.model';
 
-const createUserIntoDb = async (userData: TUser) => {
-  const result = await User.create(userData);
-  return result;
+// Fetch all users
+const getAllUserFromDB = async () => {
+  return await User.find({}); // Fetch all users without filtering by isDeleted
 };
 
-const updateUserIntoDB = async (id: string, payload: Partial<TUser>) => {
-  const result = await User.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
-  return result;
-};
+// Fetch a user by email
 const getUserFromDB = async (email: string) => {
-  const result = await User.findOne({ email });
-  return result;
+  return await User.findOne({ email });
 };
 
-const getMyBookingsFromDb = async (email: string) => {
-  // const result = await Booking.find().populate('customer')
-  const user = await User.findOne({ email });
-  if (user) {
-    const result = await Booking.find({
-      customer: user._id,
-      status: { $ne: 'pending' },
-    })
-      .populate('service', '_id name description price duration')
-      .populate('slot', '_id service date startTime endTime isBooked')
-      .select('-customer')
-      .sort({ createdAt: -1 })
-      .lean();
-    return result;
-  }
+// Create a new user
+const createUserInDB = async (payload: Record<string, unknown>) => {
+  const newUser = new User(payload); // Create a new user instance
+  return await newUser.save(); // Save the user in the database
 };
 
-export const userServices = {
-  createUserIntoDb,
-  getMyBookingsFromDb,
+// Update a user
+const updateUserInDB = async (
+  userId: string,
+  payload: Record<string, unknown>,
+) => {
+  return await User.findOneAndUpdate(
+    { _id: userId }, // Removed isDeleted check
+    payload,
+    { new: true },
+  );
+};
+
+// Update a user's role
+const updateUserRoleInDB = async (userId: string, role: string) => {
+  return await User.updateOne(
+    { _id: userId }, // Removed isDeleted check
+    { role },
+    { new: true },
+  );
+};
+
+// Soft delete a user
+const deleteUserFromDB = async (userId: string) => {
+  return await User.updateOne(
+    { _id: userId }, // Here, you might want to keep the logic for actual deletion or updating isDeleted to true
+    { isDeleted: true }, // Mark user as deleted
+    { new: true },
+  );
+};
+
+// Activate or block a user
+const toggleUserStatusInDB = async (userId: string, isActive: boolean) => {
+  return await User.updateOne(
+    { _id: userId }, // Find user by ID
+    { isActive: !isActive }, // Toggle isActive status
+    { new: true },
+  );
+};
+
+// Fetch bookings for a user by ID
+const getBookingsByUserId = async (userId: string) => {
+  return await Booking.find({ userId }); // Assuming Booking model is related to User
+};
+
+// Fetch all active users
+const getActiveUsersFromDB = async () => {
+  return await User.find({ isActive: true }); // Fetch all users who are active
+};
+
+// Fetch all blocked users
+const getBlockedUsersFromDB = async () => {
+  return await User.find({ isActive: false }); // Fetch all users who are blocked
+};
+
+// Fetch user by ID for toggling status
+const getUserById = async (userId: string) => {
+  return await User.findById(userId);
+};
+
+export const UserServices = {
+  getAllUserFromDB,
   getUserFromDB,
-  updateUserIntoDB,
+  createUserInDB,
+  updateUserInDB,
+  updateUserRoleInDB,
+  deleteUserFromDB,
+  toggleUserStatusInDB,
+  getBookingsByUserId,
+  getActiveUsersFromDB,
+  getBlockedUsersFromDB,
+  getUserById, // Export the method to fetch user by ID if needed
 };

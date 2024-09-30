@@ -2,29 +2,56 @@ import express from 'express';
 import { auth } from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLES } from './user.constant';
-import { userControllers } from './user.controller';
+import { UserController } from './user.controller';
 import { UserValidations } from './user.validation';
 
 const router = express.Router();
 
-// Get all users (Admin only)
-router.get('/', auth(USER_ROLES.admin), userControllers.getAllUser);
+// User routes
 
-// Get user info by email
-router.get('/user-info', userControllers.getUserByEmail);
+// Get all users (admin only)
+router.get('/', auth(USER_ROLES.admin), UserController.getAllUser);
 
-// Update user details (requires validation and authorization)
+// Get a user's bookings (user only)
+router.get('/my-bookings', auth(USER_ROLES.user), UserController.getMyBookings);
+
+// Get user info by email (admin or user)
+router.get('/user-info', auth(USER_ROLES.user), UserController.getUserByEmail);
+
+// Create a new user (admin only)
+router.post(
+  '/',
+  auth(USER_ROLES.admin),
+  validateRequest(UserValidations.createUserValidationSchema),
+  UserController.createUser,
+);
+
+// Update a user by ID (admin only)
 router.put(
-  '/update-user/:id', // Correct route parameter for user ID
+  '/:id',
+  auth(USER_ROLES.admin),
   validateRequest(UserValidations.updateUserValidationSchema),
-  userControllers.updateUser,
+  UserController.updateUser,
 );
 
-// Get user bookings (for logged-in users)
-router.get(
-  '/my-bookings',
-  auth(USER_ROLES.user), // Auth middleware for regular users
-  userControllers.getMyBookings,
+// Update user role by ID (admin only)
+router.patch(
+  '/:id/role',
+  auth(USER_ROLES.admin),
+  UserController.updateUserRole,
 );
+
+// Update user status by ID (admin only) - new route added
+router.patch(
+  '/:id/status',
+  auth(USER_ROLES.admin),
+  UserController.updateUserStatus, // Ensure you have a corresponding controller function
+);
+
+// Delete a user by ID (admin only)
+router.delete('/:id', auth(USER_ROLES.admin), UserController.deleteUser);
+
+// Get user by email (admin only)
+router.get('/:email', auth(USER_ROLES.admin), UserController.getUser);
 
 export const UserRoutes = router;
